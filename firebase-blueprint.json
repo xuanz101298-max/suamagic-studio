@@ -1,0 +1,132 @@
+{
+  "entities": {
+    "Work": {
+      "title": "Work",
+      "description": "A showcase project/artwork",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of the work"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the work"
+        },
+        "mediaUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the media file"
+        },
+        "mediaType": {
+          "type": "string",
+          "enum": ["image", "video"],
+          "description": "Type of media"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order"
+        }
+      },
+      "required": ["title", "description", "mediaUrl", "mediaType", "createdAt", "order"]
+    },
+    "Artist": {
+      "title": "Artist",
+      "description": "An artist profile",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the artist"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description/bio of the artist"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the artist's avatar"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order"
+        }
+      },
+      "required": ["name", "description", "avatarUrl", "createdAt", "order"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global website settings",
+      "type": "object",
+      "properties": {
+        "logoUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the website logo"
+        }
+      },
+      "required": ["logoUrl"]
+    },
+    "StudioInfo": {
+      "title": "StudioInfo",
+      "description": "Information about the studio (Creative Direction, DAO Ecosystem, etc.)",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of the info block"
+        },
+        "description": {
+          "type": "string",
+          "description": "Chinese description"
+        },
+        "descriptionEn": {
+          "type": "string",
+          "description": "English description"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order"
+        }
+      },
+      "required": ["title", "description", "descriptionEn", "order"]
+    }
+  },
+  "firestore": {
+    "/works/{workId}": {
+      "schema": {
+        "$ref": "#/entities/Work"
+      },
+      "description": "Collection of showcase works"
+    },
+    "/artists/{artistId}": {
+      "schema": {
+        "$ref": "#/entities/Artist"
+      },
+      "description": "Collection of signed artists"
+    },
+    "/settings/{settingId}": {
+      "schema": {
+        "$ref": "#/entities/Settings"
+      },
+      "description": "Global settings like logo"
+    },
+    "/about/{infoId}": {
+      "schema": {
+        "$ref": "#/entities/StudioInfo"
+      },
+      "description": "Collection of studio information blocks"
+    }
+  }
+}
