@@ -125,7 +125,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
           <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => !isEditMode && setActiveWork(work)}>
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
-                <video src={work.mediaUrl} autoPlay muted loop playsInline className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                <video src={work.mediaUrl} autoPlay muted loop playsInline webkit-playsInline controls={false} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
               ) : (
                 <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
               )}
@@ -222,6 +222,8 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                   src={activeWork.mediaUrl}
                   controls
                   autoPlay
+                  playsInline
+                  webkit-playsInline
                   className="w-full max-h-[75vh] object-contain bg-[#111]"
                 />
               ) : (
