@@ -148,10 +148,12 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
             className="group relative flex flex-col cursor-pointer" 
             onClick={() => {
               if (isEditMode) return;
-              // 视频和图片都打开全屏播放
-              if (work.mediaType === 'video' || work.mediaType === 'image') {
-                setActiveWork(work);
-              }
+              setActiveWork(work);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              if (isEditMode) return;
+              setActiveWork(work);
             }}
           >
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
