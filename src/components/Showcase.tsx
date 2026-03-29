@@ -138,10 +138,6 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
               {isEditMode && (
                 <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 z-20">
-                  <label className="cursor-pointer p-4 bg-white/10 text-white rounded-full hover:bg-[#F5A623] hover:text-black transition-colors">
-                    {isUploading === work.id ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={24} />}
-                    <input type="file" accept="image/*, video/*" className="hidden" onChange={(e) => handleMediaUpload(work.id, e)} disabled={isUploading === work.id} />
-                  </label>
                   <button onClick={(e) => { e.stopPropagation(); handleDelete(work.id); }} className="p-4 bg-white/10 text-white rounded-full hover:bg-red-500 transition-colors">
                     <Trash2 size={24} />
                   </button>
