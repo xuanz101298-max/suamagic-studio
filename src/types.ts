@@ -6,6 +6,7 @@ export interface Work {
   year?: string;
   mediaUrl: string;
   mediaType: 'video' | 'image';
+  coverImageUrl?: string;
   createdAt?: string;
   order?: number;
 }

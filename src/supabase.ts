@@ -26,6 +26,7 @@ export interface DbWork {
   year?: string;
   media_url?: string;
   media_type?: string;
+  cover_image_url?: string;
   created_at?: string;
   order_num?: number;
 }
@@ -57,6 +58,7 @@ export function convertWork(dbWork: DbWork) {
     year: dbWork.year,
     mediaUrl: dbWork.media_url,
     mediaType: dbWork.media_type,
+    coverImageUrl: dbWork.cover_image_url,
     createdAt: dbWork.created_at,
     order: dbWork.order_num,
   };
