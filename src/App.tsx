@@ -14,12 +14,15 @@ import { getWorks, getArtists, getStudioInfo, getSettings } from './supabase';
 import { Work, Artist, StudioInfo } from './types';
 
 export default function App() {
-  const [isEditMode, setIsEditMode] = useState(false);
+  // 编辑模式已禁用，所有内容从后端修改
+  const isEditMode = false;
+  const setIsEditMode = () => {};
+  const isAdmin = false;
+  
   const [works, setWorks] = useState<Work[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [about, setAbout] = useState<StudioInfo[]>([]);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(true);
   const [loading, setLoading] = useState(true);
 
   // 数据获取 - 直接获取，不用订阅
@@ -81,7 +84,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black">
-      <Navbar isEditMode={isEditMode} setIsEditMode={setIsEditMode} logoUrl={logoUrl} setLogoUrl={setLogoUrl} isAdmin={isAdmin} />
+      <Navbar isEditMode={isEditMode} logoUrl={logoUrl} />
       <main>
         <Hero />
         <About about={about} isEditMode={isEditMode} />
