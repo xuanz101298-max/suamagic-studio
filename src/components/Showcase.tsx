@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Work } from '../types';
 import { Plus, Trash2, Upload, Play, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,12 +16,37 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
   const [activeWork, setActiveWork] = useState<Work | null>(null);
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categories = ['FILM', 'COMMERCIAL', 'CONCEPT'];
+
+  // 检测是否为移动端
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const itemsPerPage = isMobile ? 3 : 6;
 
   const filteredWorks = filter === 'ALL' 
     ? works 
     : works.filter(w => w.category === filter);
+
+  // 分页
+  const totalPages = Math.ceil(filteredWorks.length / itemsPerPage);
+  const paginatedWorks = filteredWorks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // 切换筛选时重置页码
+  const handleFilterChange = (newFilter: string) => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+  };
 
   const handleAddWork = async () => {
     const newId = Date.now().toString();
@@ -99,7 +124,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
           
           <div className="flex flex-wrap gap-4 mt-8">
             <button 
-              onClick={() => setFilter('ALL')}
+              onClick={() => handleFilterChange('ALL')}
               className={`text-[10px] font-mono uppercase tracking-widest px-4 py-1 border transition-all ${filter === 'ALL' ? 'bg-[#F5A623] border-[#F5A623] text-black' : 'border-white/20 text-white/50 hover:border-white/50'}`}
             >
               ALL
@@ -107,7 +132,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
             {categories.map(cat => (
               <button 
                 key={cat}
-                onClick={() => setFilter(cat)}
+                onClick={() => handleFilterChange(cat)}
                 className={`text-[10px] font-mono uppercase tracking-widest px-4 py-1 border transition-all ${filter === cat ? 'bg-[#F5A623] border-[#F5A623] text-black' : 'border-white/20 text-white/50 hover:border-white/50'}`}
               >
                 {cat}
@@ -123,7 +148,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 border-t border-dotted border-white/30 pt-12">
-        {filteredWorks.map((work) => (
+        {paginatedWorks.map((work) => (
           <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => !isEditMode && setActiveWork(work)}>
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
@@ -184,6 +209,29 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
           </div>
         ))}
       </div>
+
+      {/* 分页控件 */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-16">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="text-[10px] font-mono uppercase tracking-widest px-4 py-2 border border-white/20 text-white/50 hover:border-white hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            ← Prev
+          </button>
+          <span className="text-[10px] font-mono text-white/50">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="text-[10px] font-mono uppercase tracking-widest px-4 py-2 border border-white/20 text-white/50 hover:border-white hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
       <div className="mt-24 pt-12 border-t border-dotted border-white/30 text-center">
         <p className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em]">
