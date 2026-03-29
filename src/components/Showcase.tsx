@@ -28,10 +28,6 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
   const categories = ['film', 'commercial', 'concept'];
 
-  // 检测是否为移动端
-  const [isMobile, setIsMobile] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState<string | null>(null);
-
   const itemsPerPage = isMobile ? 3 : 6;
 
   const filteredWorks = filter === 'ALL' 
