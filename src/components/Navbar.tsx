@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit3, X, Upload, LogIn, LogOut } from 'lucide-react';
+import { Edit3, X, Upload, LogOut } from 'lucide-react';
 import { saveSettings } from '../supabase';
 
 interface NavbarProps {
@@ -39,9 +39,6 @@ export default function Navbar({ isEditMode, setIsEditMode, logoUrl, setLogoUrl,
   };
 
   // 暂时禁用登录功能（需要后续添加 Supabase Auth）
-  const handleLogin = () => {
-    alert("登录功能暂时不可用。当前默认为管理员模式。");
-  };
 
   const handleLogout = () => {
     setIsEditMode(false);
@@ -114,13 +111,7 @@ export default function Navbar({ isEditMode, setIsEditMode, logoUrl, setLogoUrl,
             </button>
           )}
 
-          <button
-            onClick={handleLogin}
-            className="flex items-center gap-2 text-[10px] font-mono text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
-            title="Admin Login"
-          >
-            <LogIn size={14} />
-          </button>
+
         </div>
       </div>
     </nav>
