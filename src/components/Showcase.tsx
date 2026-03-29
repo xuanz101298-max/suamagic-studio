@@ -150,11 +150,6 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
               if (isEditMode) return;
               setActiveWork(work);
             }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              if (isEditMode) return;
-              setActiveWork(work);
-            }}
           >
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
