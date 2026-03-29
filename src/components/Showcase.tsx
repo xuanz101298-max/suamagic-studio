@@ -150,7 +150,10 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 border-t border-dotted border-white/30 pt-12">
         {paginatedWorks.map((work) => (
-          <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => {
+          <div 
+            key={work.id} 
+            className="group relative flex flex-col cursor-pointer" 
+            onClick={() => {
               if (isEditMode) return;
               // 电脑端：点击打开全屏播放
               // 手机端：视频直接播放，图片打开全屏
@@ -161,7 +164,15 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
               } else {
                 setActiveWork(work);
               }
-            }}>
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              if (isEditMode) return;
+              if (work.mediaType === 'video') {
+                setPlayingVideo(playingVideo === work.id ? null : work.id);
+              }
+            }}
+          >
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
                 <>
