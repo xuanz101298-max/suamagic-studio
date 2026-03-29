@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Work } from '../types';
 import { Plus, Trash2, Upload, Play, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase, TABLES } from '../supabase';
-import { uploadFileToStorage } from '../utils/storageUtils';
+import { saveWork } from '../supabase';
+import { uploadFile } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ShowcaseProps {
@@ -25,28 +25,32 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
   const handleAddWork = async () => {
     const newId = Date.now().toString();
-    const newWork = {
+    const newWork: Work = {
       id: newId,
       title: 'NEW PROJECT',
       description: 'Description here...',
       category: 'FILM',
       year: new Date().getFullYear().toString(),
-      media_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop',
-      media_type: 'image',
-      created_at: new Date().toISOString(),
-      order_num: works.length > 0 ? Math.max(...works.map(w => w.order || 0)) + 1 : 1
+      mediaUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop',
+      mediaType: 'image',
+      createdAt: new Date().toISOString(),
+      order: works.length > 0 ? Math.max(...works.map(w => w.order || 0)) + 1 : 1
     };
     try {
-      await supabase.from(TABLES.WORKS).insert(newWork);
+      await saveWork(newWork);
     } catch (error) {
       console.error("Error adding work:", error);
-      alert("Failed to add project.");
+      alert("Failed to add project. Please check your permissions.");
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      await supabase.from(TABLES.WORKS).delete().eq('id', id);
+      // 标记删除（需要后端支持真正的删除）
+      const workToDelete = works.find(w => w.id === id);
+      if (workToDelete) {
+        await saveWork({ ...workToDelete, order: -1 } as any); // 简单标记
+      }
     } catch (error) {
       console.error("Error deleting work:", error);
     }
@@ -54,7 +58,9 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
   const handleUpdate = async (id: string, field: keyof Work, value: string) => {
     try {
-      await supabase.from(TABLES.WORKS).update({ [field]: value }).eq('id', id);
+      const workToUpdate = works.find(w => w.id === id);
+      if (!workToUpdate) return;
+      await saveWork({ ...workToUpdate, [field]: value });
     } catch (error) {
       console.error("Error updating work:", error);
     }
@@ -70,8 +76,11 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
       setIsUploading(id);
       try {
         const type = file.type.startsWith('video/') ? 'video' : 'image';
-        const url = await uploadFileToStorage(file, `works/${id}_${Date.now()}`);
-        await supabase.from(TABLES.WORKS).update({ media_url: url, media_type: type }).eq('id', id);
+        const url = await uploadFile(file, `works/${id}_${Date.now()}`);
+        const workToUpdate = works.find(w => w.id === id);
+        if (workToUpdate) {
+          await saveWork({ ...workToUpdate, mediaUrl: url, mediaType: type });
+        }
       } catch (error: any) {
         console.error("Error uploading media:", error);
         alert(`Failed to upload media: ${error.message || 'Unknown error'}`);
@@ -118,9 +127,9 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
           <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => !isEditMode && setActiveWork(work)}>
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
-                <video src={work.mediaUrl || work.media_url} autoPlay muted loop playsInline webkit-playsInline controls={false} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                <video src={work.mediaUrl} autoPlay muted loop playsInline webkit-playsInline controls={false} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
               ) : (
-                <img src={work.mediaUrl || work.media_url} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
+                <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
               )}
 
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-white/50 bg-black/50 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors z-10 opacity-0 group-hover:opacity-100 backdrop-blur-sm">
@@ -210,7 +219,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
             >
               {activeWork.mediaType === 'video' ? (
                 <video
-                  src={activeWork.mediaUrl || activeWork.media_url}
+                  src={activeWork.mediaUrl}
                   controls
                   autoPlay
                   playsInline
@@ -219,7 +228,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                 />
               ) : (
                 <img
-                  src={activeWork.mediaUrl || activeWork.media_url}
+                  src={activeWork.mediaUrl}
                   alt={activeWork.title}
                   className="w-full max-h-[75vh] object-contain bg-[#111]"
                   referrerPolicy="no-referrer"

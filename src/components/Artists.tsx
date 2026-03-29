@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Artist } from '../types';
 import { Plus, Trash2, Upload, ArrowRight } from 'lucide-react';
-import { supabase, TABLES } from '../supabase';
-import { uploadFileToStorage } from '../utils/storageUtils';
+import { saveArtist } from '../supabase';
+import { uploadFile } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ArtistsProps {
@@ -30,7 +30,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
     try {
       const artistToUpdate = artists.find(a => a.id === id);
       if (!artistToUpdate) return;
-      await supabase.from(TABLES.ARTISTS).update({ [field]: value }).eq('id', id);
+      await saveArtist({ ...artistToUpdate, [field]: value });
     } catch (error) {
       console.error("Error updating artist:", error);
     }
@@ -45,8 +45,11 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
       }
       setIsUploading(id);
       try {
-        const url = await uploadFileToStorage(file, `artists/${id}_${Date.now()}`);
-        await supabase.from(TABLES.ARTISTS).update({ avatar_url: url }).eq('id', id);
+        const url = await uploadFile(file, `artists/${id}_${Date.now()}`);
+        const artistToUpdate = artists.find(a => a.id === id);
+        if (artistToUpdate) {
+          await saveArtist({ ...artistToUpdate, avatarUrl: url });
+        }
       } catch (error: any) {
         console.error("Error uploading avatar:", error);
         alert(`Failed to upload avatar: ${error.message || 'Unknown error'}`);
@@ -58,15 +61,16 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
 
   const handleAddArtist = async () => {
     const newId = Date.now().toString();
-    const newArtist = {
+    const newArtist: Artist = {
       id: newId,
       name: 'NEW ARTIST',
       description: 'Artist description...',
-      avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop',
-      order_num: artists.length > 0 ? Math.max(...artists.map(a => a.order || 0)) + 1 : 1
+      avatarUrl: `https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop`,
+      createdAt: new Date().toISOString(),
+      order: artists.length > 0 ? Math.max(...artists.map(a => a.order || 0)) + 1 : 1
     };
     try {
-      await supabase.from(TABLES.ARTISTS).insert(newArtist);
+      await saveArtist(newArtist);
       setCurrentIndex(artists.length);
     } catch (error) {
       console.error("Error adding artist:", error);
@@ -75,7 +79,10 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
 
   const handleDelete = async (id: string) => {
     try {
-      await supabase.from(TABLES.ARTISTS).delete().eq('id', id);
+      const artistToDelete = artists.find(a => a.id === id);
+      if (artistToDelete) {
+        await saveArtist({ ...artistToDelete, order: -1 } as any);
+      }
       if (currentIndex >= artists.length - 1) {
         setCurrentIndex(Math.max(0, artists.length - 2));
       }
@@ -94,7 +101,8 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
             key={activeArtist.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.15 }}
-            src={activeArtist.avatarUrl || activeArtist.avatar_url} 
+            transition={{ duration: 1 }}
+            src={activeArtist.avatarUrl} 
             className="w-full h-full object-cover filter blur-[100px] scale-110"
             referrerPolicy="no-referrer"
           />
@@ -153,7 +161,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
               onDragEnd={handleDragEnd}
               onClick={() => !isActive && setCurrentIndex(index)}
             >
-              <img src={artist.avatarUrl || artist.avatar_url} alt={artist.name} className="w-full h-full object-cover pointer-events-none" referrerPolicy="no-referrer" />
+              <img src={artist.avatarUrl} alt={artist.name} className="w-full h-full object-cover pointer-events-none" referrerPolicy="no-referrer" />
               
               {isEditMode && isActive && (
                 <div className="absolute inset-0 bg-black/80 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">

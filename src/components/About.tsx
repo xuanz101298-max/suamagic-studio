@@ -1,8 +1,7 @@
 import React from 'react';
 import { StudioInfo } from '../types';
 import EditableField from './EditableField';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { saveStudioInfo } from '../supabase';
 
 interface AboutProps {
   about: StudioInfo[];
@@ -14,7 +13,7 @@ export default function About({ about, isEditMode }: AboutProps) {
     try {
       const infoToUpdate = about.find(i => i.id === id);
       if (!infoToUpdate) return;
-      await setDoc(doc(db, 'about', id), { ...infoToUpdate, [field]: value }, { merge: true });
+      await saveStudioInfo({ ...infoToUpdate, [field]: value });
     } catch (error) {
       console.error("Error updating about info:", error);
     }
@@ -58,7 +57,7 @@ export default function About({ about, isEditMode }: AboutProps) {
                 {isEditMode ? (
                   <EditableField
                     isTextArea
-                    value={info.descriptionEn}
+                    value={info.descriptionEn || ''}
                     onSave={(val) => handleUpdate(info.id, 'descriptionEn', val)}
                     className="bg-transparent text-white/30 text-xs md:text-sm font-mono uppercase tracking-[0.25em] leading-relaxed max-w-4xl pl-6 focus:outline-none focus:border-[#F5A623] w-full resize-none"
                     rows={3}

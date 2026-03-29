@@ -4,34 +4,25 @@ export interface Work {
   description: string;
   category?: string;
   year?: string;
-  mediaUrl?: string;
-  media_url?: string;
-  mediaType?: string;
-  media_type?: string;
+  mediaUrl: string;
+  mediaType: 'video' | 'image';
   createdAt?: string;
-  created_at?: string;
   order?: number;
-  order_num?: number;
 }
 
 export interface Artist {
   id: string;
   name: string;
   description: string;
-  avatarUrl?: string;
-  avatar_url?: string;
+  avatarUrl: string;
   createdAt?: string;
-  created_at?: string;
   order?: number;
-  order_num?: number;
 }
 
 export interface StudioInfo {
   id: string;
   title: string;
   description: string;
-  descriptionEn?: string;
-  description_en?: string;
+  descriptionEn: string;
   order: number;
-  order_num?: number;
 }

@@ -1,9 +1,7 @@
 import React from 'react';
 import { Edit3, X, Upload, LogIn, LogOut } from 'lucide-react';
-import { auth, db } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { uploadFileToStorage } from '../utils/firebaseUtils';
+import { saveSettings } from '../supabase';
+import { uploadFile } from '../utils/storageUtils';
 
 interface NavbarProps {
   isEditMode: boolean;
@@ -22,8 +20,8 @@ export default function Navbar({ isEditMode, setIsEditMode, logoUrl, setLogoUrl,
         return;
       }
       try {
-        const url = await uploadFileToStorage(file, `settings/logo_${Date.now()}`);
-        await setDoc(doc(db, 'settings', 'global'), { logoUrl: url }, { merge: true });
+        const url = await uploadFile(file, `settings/logo_${Date.now()}`);
+        await saveSettings({ logoUrl: url });
         setLogoUrl(url);
       } catch (error: any) {
         console.error("Error uploading logo:", error);
@@ -34,29 +32,20 @@ export default function Navbar({ isEditMode, setIsEditMode, logoUrl, setLogoUrl,
 
   const handleRemoveLogo = async () => {
     try {
-      await setDoc(doc(db, 'settings', 'global'), { logoUrl: null }, { merge: true });
+      await saveSettings({ logoUrl: '' });
       setLogoUrl(null);
     } catch (error) {
       console.error("Error removing logo:", error);
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+  // 暂时禁用登录功能（需要后续添加 Supabase Auth）
+  const handleLogin = () => {
+    alert("登录功能暂时不可用。当前默认为管理员模式。");
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setIsEditMode(false);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+  const handleLogout = () => {
+    setIsEditMode(false);
   };
 
   return (
@@ -126,23 +115,13 @@ export default function Navbar({ isEditMode, setIsEditMode, logoUrl, setLogoUrl,
             </button>
           )}
 
-          {auth.currentUser ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-[10px] font-mono text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
-              title="Sign Out"
-            >
-              <LogOut size={14} />
-            </button>
-          ) : (
-            <button
-              onClick={handleLogin}
-              className="flex items-center gap-2 text-[10px] font-mono text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
-              title="Admin Login"
-            >
-              <LogIn size={14} />
-            </button>
-          )}
+          <button
+            onClick={handleLogin}
+            className="flex items-center gap-2 text-[10px] font-mono text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+            title="Admin Login"
+          >
+            <LogIn size={14} />
+          </button>
         </div>
       </div>
     </nav>
