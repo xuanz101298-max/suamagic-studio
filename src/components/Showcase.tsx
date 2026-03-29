@@ -16,6 +16,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   const categories = ['film', 'commercial', 'concept'];
 
@@ -148,10 +149,34 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 border-t border-dotted border-white/30 pt-12">
         {paginatedWorks.map((work) => (
-          <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => !isEditMode && setActiveWork(work)}>
+          <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => {
+              if (isEditMode) return;
+              if (work.mediaType === 'video') {
+                setPlayingVideo(playingVideo === work.id ? null : work.id);
+              } else {
+                setActiveWork(work);
+              }
+            }}>
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
-                <video src={work.mediaUrl} autoPlay muted loop playsInline webkit-playsInline controls={false} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                <>
+                  {/* 电脑端：显示封面，点击播放 */}
+                  <video 
+                    src={work.mediaUrl} 
+                    autoPlay={playingVideo === work.id}
+                    muted={playingVideo === work.id}
+                    loop={playingVideo === work.id}
+                    playsInline 
+                    webkit-playsInline 
+                    controls={false}
+                    onEnded={() => setPlayingVideo(null)}
+                    className={`w-full h-full object-cover transition-all duration-700 ${playingVideo === work.id ? 'opacity-100' : 'opacity-0 absolute'}`}
+                  />
+                  {/* 封面：电脑端hover显示，手机端始终显示 */}
+                  <div className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ${playingVideo === work.id ? 'opacity-0' : 'opacity-100'} md:group-hover:opacity-0`} style={{ backgroundImage: `url(${work.mediaUrl})` }} />
+                  {/* 黑色占位符（仅手机端） */}
+                  <div className="absolute inset-0 bg-[#111] md:hidden" />
+                </>
               ) : (
                 <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
               )}
