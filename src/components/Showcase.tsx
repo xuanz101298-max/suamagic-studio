@@ -175,12 +175,12 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                     webkit-playsInline 
                     controls={false}
                     onEnded={() => setPlayingVideo(null)}
-                    className={`w-full h-full object-cover transition-all duration-700 ${playingVideo === work.id ? 'opacity-100' : 'opacity-0 absolute'}`}
+                    className={`w-full h-full object-cover transition-all duration-700 absolute inset-0 ${playingVideo === work.id ? 'opacity-100 z-10' : 'opacity-0'}`}
                   />
                   {/* 封面：电脑端hover显示，手机端始终显示 */}
                   <div className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ${playingVideo === work.id ? 'opacity-0' : 'opacity-100'} md:group-hover:opacity-0`} style={{ backgroundImage: `url(${work.mediaUrl})` }} />
-                  {/* 黑色占位符（仅手机端） */}
-                  <div className="absolute inset-0 bg-[#111] md:hidden" />
+                  {/* 黑色占位符（仅手机端，不播放时显示） */}
+                  <div className={`absolute inset-0 bg-[#111] md:hidden transition-opacity ${playingVideo === work.id ? 'opacity-0' : 'opacity-100'}`} />
                 </>
               ) : (
                 <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
