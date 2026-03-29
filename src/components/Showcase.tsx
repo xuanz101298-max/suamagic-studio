@@ -22,6 +22,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
 
   // 检测是否为移动端
   const [isMobile, setIsMobile] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState<string | null>(null);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -151,7 +152,11 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
         {paginatedWorks.map((work) => (
           <div key={work.id} className="group relative flex flex-col cursor-pointer" onClick={() => {
               if (isEditMode) return;
-              if (work.mediaType === 'video') {
+              // 电脑端：点击打开全屏播放
+              // 手机端：视频直接播放，图片打开全屏
+              if (!isMobile && work.mediaType === 'video') {
+                setActiveWork(work);
+              } else if (work.mediaType === 'video') {
                 setPlayingVideo(playingVideo === work.id ? null : work.id);
               } else {
                 setActiveWork(work);
