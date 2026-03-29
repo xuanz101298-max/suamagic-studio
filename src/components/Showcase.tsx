@@ -271,7 +271,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                 <video
                   src={activeWork.mediaUrl}
                   controls
-                  autoPlay
+                  autoPlay={!isMobile}
                   playsInline
                   webkit-playsInline
                   className="w-full max-h-[75vh] object-contain bg-[#111]"
