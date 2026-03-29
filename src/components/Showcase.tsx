@@ -16,6 +16,15 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 检测是否为移动端
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const categories = ['film', 'commercial', 'concept'];
 
