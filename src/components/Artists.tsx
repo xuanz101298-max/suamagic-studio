@@ -2,9 +2,8 @@ import React, { useState, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Artist } from '../types';
 import { Plus, Trash2, Upload, ArrowRight } from 'lucide-react';
-import { db } from '../firebase';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { uploadFileToStorage } from '../utils/firebaseUtils';
+import { supabase, TABLES } from '../supabase';
+import { uploadFileToStorage } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ArtistsProps {
@@ -31,7 +30,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
     try {
       const artistToUpdate = artists.find(a => a.id === id);
       if (!artistToUpdate) return;
-      await setDoc(doc(db, 'artists', id), { ...artistToUpdate, [field]: value }, { merge: true });
+      await supabase.from(TABLES.ARTISTS).update({ [field]: value }).eq('id', id);
     } catch (error) {
       console.error("Error updating artist:", error);
     }
@@ -47,10 +46,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
       setIsUploading(id);
       try {
         const url = await uploadFileToStorage(file, `artists/${id}_${Date.now()}`);
-        const artistToUpdate = artists.find(a => a.id === id);
-        if (artistToUpdate) {
-          await setDoc(doc(db, 'artists', id), { ...artistToUpdate, avatarUrl: url }, { merge: true });
-        }
+        await supabase.from(TABLES.ARTISTS).update({ avatar_url: url }).eq('id', id);
       } catch (error: any) {
         console.error("Error uploading avatar:", error);
         alert(`Failed to upload avatar: ${error.message || 'Unknown error'}`);
@@ -62,16 +58,15 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
 
   const handleAddArtist = async () => {
     const newId = Date.now().toString();
-    const newArtist: Artist = {
+    const newArtist = {
       id: newId,
       name: 'NEW ARTIST',
       description: 'Artist description...',
-      avatarUrl: `https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop`,
-      createdAt: new Date().toISOString(),
-      order: artists.length > 0 ? Math.max(...artists.map(a => a.order || 0)) + 1 : 1
+      avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop',
+      order_num: artists.length > 0 ? Math.max(...artists.map(a => a.order || 0)) + 1 : 1
     };
     try {
-      await setDoc(doc(db, 'artists', newId), newArtist);
+      await supabase.from(TABLES.ARTISTS).insert(newArtist);
       setCurrentIndex(artists.length);
     } catch (error) {
       console.error("Error adding artist:", error);
@@ -80,7 +75,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'artists', id));
+      await supabase.from(TABLES.ARTISTS).delete().eq('id', id);
       if (currentIndex >= artists.length - 1) {
         setCurrentIndex(Math.max(0, artists.length - 2));
       }
@@ -93,15 +88,13 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
 
   return (
     <section className="py-32 overflow-hidden relative bg-black" id="artists">
-      {/* Background Blur Effect */}
       {activeArtist && (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden flex items-center justify-center">
           <motion.img 
             key={activeArtist.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.15 }}
-            transition={{ duration: 1 }}
-            src={activeArtist.avatarUrl} 
+            src={activeArtist.avatarUrl || activeArtist.avatar_url} 
             className="w-full h-full object-cover filter blur-[100px] scale-110"
             referrerPolicy="no-referrer"
           />
@@ -133,11 +126,10 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
           const absOffset = Math.abs(offset);
           const isActive = offset === 0;
 
-          // Cover Flow calculations matching the reference
           const scale = isActive ? 1.3 : Math.max(0.7, 1 - absOffset * 0.15);
-          const rotateY = offset * -15; // Left faces right, right faces left
-          const rotateZ = offset * 8;   // Left tilts counter-clockwise, right tilts clockwise
-          const x = offset * 140;       // Reduced distance between cards
+          const rotateY = offset * -15;
+          const rotateZ = offset * 8;
+          const x = offset * 140;
           const zIndex = 100 - absOffset;
           const opacity = isActive ? 1 : Math.max(0.3, 1 - absOffset * 0.4);
 
@@ -161,7 +153,7 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
               onDragEnd={handleDragEnd}
               onClick={() => !isActive && setCurrentIndex(index)}
             >
-              <img src={artist.avatarUrl} alt={artist.name} className="w-full h-full object-cover pointer-events-none" referrerPolicy="no-referrer" />
+              <img src={artist.avatarUrl || artist.avatar_url} alt={artist.name} className="w-full h-full object-cover pointer-events-none" referrerPolicy="no-referrer" />
               
               {isEditMode && isActive && (
                 <div className="absolute inset-0 bg-black/80 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">
@@ -179,7 +171,6 @@ export default function Artists({ artists, setArtists, isEditMode }: ArtistsProp
         })}
       </div>
 
-      {/* Active Artist Info Below Carousel */}
       {activeArtist && (
         <div className="relative z-10 max-w-4xl mx-auto text-center mt-12 px-6">
           {isEditMode ? (
