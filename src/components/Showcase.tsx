@@ -284,10 +284,6 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                   referrerPolicy="no-referrer"
                 />
               )}
-              <div className="w-full mt-6 text-left">
-                <h3 className="text-white text-2xl font-bold uppercase tracking-tight">{activeWork.title}</h3>
-                <p className="text-gray-400 text-sm font-light mt-2 max-w-2xl">{activeWork.description}</p>
-              </div>
             </motion.div>
           </motion.div>
         )}
