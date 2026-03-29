@@ -17,7 +17,7 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
   const [filter, setFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const categories = ['FILM', 'COMMERCIAL', 'CONCEPT'];
+  const categories = ['film', 'commercial', 'concept'];
 
   // 检测是否为移动端
   const [isMobile, setIsMobile] = useState(false);
