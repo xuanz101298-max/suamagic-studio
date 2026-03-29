@@ -16,19 +16,12 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
-  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   const categories = ['film', 'commercial', 'concept'];
 
   // 检测是否为移动端
   const [isMobile, setIsMobile] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState<string | null>(null);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const itemsPerPage = isMobile ? 3 : 6;
 
@@ -155,44 +148,15 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
             className="group relative flex flex-col cursor-pointer" 
             onClick={() => {
               if (isEditMode) return;
-              // 电脑端：点击打开全屏播放
-              // 手机端：视频直接播放，图片打开全屏
-              if (!isMobile && work.mediaType === 'video') {
+              // 视频和图片都打开全屏播放
+              if (work.mediaType === 'video' || work.mediaType === 'image') {
                 setActiveWork(work);
-              } else if (work.mediaType === 'video') {
-                setPlayingVideo(playingVideo === work.id ? null : work.id);
-              } else {
-                setActiveWork(work);
-              }
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              if (isEditMode) return;
-              if (work.mediaType === 'video') {
-                setPlayingVideo(playingVideo === work.id ? null : work.id);
               }
             }}
           >
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
-                <>
-                  {/* 电脑端：显示封面，点击播放 */}
-                  <video 
-                    src={work.mediaUrl} 
-                    autoPlay={playingVideo === work.id}
-                    muted={playingVideo === work.id}
-                    loop={playingVideo === work.id}
-                    playsInline 
-                    webkit-playsInline 
-                    controls={false}
-                    onEnded={() => setPlayingVideo(null)}
-                    className={`w-full h-full object-cover transition-all duration-700 absolute inset-0 ${playingVideo === work.id ? 'opacity-100 z-10' : 'opacity-0'}`}
-                  />
-                  {/* 封面：电脑端hover显示，手机端始终显示 */}
-                  <div className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ${playingVideo === work.id ? 'opacity-0' : 'opacity-100'} md:group-hover:opacity-0`} style={{ backgroundImage: `url(${work.mediaUrl})` }} />
-                  {/* 黑色占位符（仅手机端，不播放时显示） */}
-                  <div className={`absolute inset-0 bg-[#111] md:hidden transition-opacity ${playingVideo === work.id ? 'opacity-0' : 'opacity-100'}`} />
-                </>
+                <div className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${work.mediaUrl})` }} />
               ) : (
                 <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
               )}
