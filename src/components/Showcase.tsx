@@ -3,7 +3,6 @@ import { Work } from '../types';
 import { Plus, Trash2, Upload, Play, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { saveWork } from '../supabase';
-import { uploadFile } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ShowcaseProps {

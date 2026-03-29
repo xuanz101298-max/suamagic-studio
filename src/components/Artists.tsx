@@ -3,7 +3,6 @@ import { motion, PanInfo } from 'framer-motion';
 import { Artist } from '../types';
 import { Plus, Trash2, Upload, ArrowRight } from 'lucide-react';
 import { saveArtist } from '../supabase';
-import { uploadFile } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ArtistsProps {

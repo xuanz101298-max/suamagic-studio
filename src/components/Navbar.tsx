@@ -1,7 +1,6 @@
 import React from 'react';
 import { Edit3, X, Upload, LogIn, LogOut } from 'lucide-react';
 import { saveSettings } from '../supabase';
-import { uploadFile } from '../utils/storageUtils';
 
 interface NavbarProps {
   isEditMode: boolean;
