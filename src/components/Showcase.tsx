@@ -4,7 +4,7 @@ import { Plus, Trash2, Upload, Play, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { uploadFileToStorage } from '../utils/firebaseUtils';
+import { uploadFileToStorage } from '../utils/storageUtils';
 import EditableField from './EditableField';
 
 interface ShowcaseProps {
