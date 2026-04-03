@@ -158,7 +158,16 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
           >
             <div className="aspect-[16/9] bg-[#111] overflow-hidden relative mb-6 rounded-lg">
               {work.mediaType === 'video' ? (
-                <div className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${work.coverImageUrl || work.mediaUrl})` }} />
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-105" 
+                  style={{ backgroundImage: work.coverImageUrl ? `url(${work.coverImageUrl})` : 'none' }}
+                >
+                  {!work.coverImageUrl && (
+                    <div className="w-full h-full flex items-center justify-center bg-[#222]">
+                      <Play size={32} className="text-white/30" />
+                    </div>
+                  )}
+                </div>
               ) : (
                 <img src={work.mediaUrl} alt={work.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" referrerPolicy="no-referrer" />
               )}
@@ -271,9 +280,10 @@ export default function Showcase({ works, setWorks, isEditMode }: ShowcaseProps)
                 <video
                   src={activeWork.mediaUrl}
                   controls
-                  autoPlay={false}
+                  autoPlay
                   playsInline
-                  webkit-playsInline
+                  muted
+                  preload="auto"
                   className="w-full max-h-[75vh] object-contain bg-[#111]"
                 />
               ) : (
