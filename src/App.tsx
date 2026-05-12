@@ -91,27 +91,16 @@ export default function App() {
         <Showcase works={works} setWorks={setWorks} isEditMode={isEditMode} />
         <Artists artists={artists} setArtists={setArtists} isEditMode={isEditMode} />
       </main>
-      <footer className="py-16 border-t border-white/10 text-center flex flex-col items-center justify-center gap-4 bg-black">
-        {logoUrl ? (
-          <img src={logoUrl} alt="SuaMagic Studio" className="h-12 object-contain opacity-50" style={{ filter: 'invert(1)' }} />
-        ) : (
-          <div className="flex flex-col items-center">
-            <img 
-              src="/logo.png" 
-              alt="SuaMagic Studio" 
-              className="h-12 object-contain opacity-50"
-              style={{ filter: 'invert(1)' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const textFallback = e.currentTarget.nextElementSibling;
-                if (textFallback) textFallback.classList.remove('hidden');
-              }} 
-            />
-            <div className="hidden font-bold text-xl tracking-tighter uppercase text-white">SuaMagic Studio</div>
-          </div>
-        )}
-        <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-4">
-          © {new Date().getFullYear()} Future Art Laboratory. All rights reserved.
+      <footer className="py-12 border-t border-white/8 text-center flex flex-col items-center justify-center gap-3 bg-black">
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-px bg-[#F5A623]/40" />
+          <span className="text-[9px] font-mono tracking-[0.3em] text-white/25 uppercase">
+            SuaMagic Studio
+          </span>
+          <div className="w-6 h-px bg-[#F5A623]/40" />
+        </div>
+        <p className="text-[9px] font-mono text-white/15 tracking-widest uppercase">
+          © {new Date().getFullYear()} Future Art Laboratory — All rights reserved.
         </p>
       </footer>
     </div>

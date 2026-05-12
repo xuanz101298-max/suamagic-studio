@@ -11,29 +11,28 @@
 @layer base {
   body {
     @apply bg-black text-white antialiased selection:bg-white selection:text-black;
+    overflow-x: hidden;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight;
   }
-}
 
-body {
-  background-color: #000000;
-  color: #ffffff;
-  overflow-x: hidden;
+  a {
+    @apply transition-colors duration-200;
+  }
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 4px;
+  background: #333;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: #555;
 }
